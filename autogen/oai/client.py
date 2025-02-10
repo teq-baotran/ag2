@@ -371,6 +371,14 @@ class OpenAIClient:
                 raise e
 
         return wrapper
+    
+    @staticmethod
+    def _remove_assistant_names_from_messages(params: dict[str, Any]):
+        def _remove_assistant_names(messages: list[dict[str, Any]]):
+            def _remove_name(message: dict[str, Any]):
+                return {k: v for k, v in message.items() if k != "name"}
+            return [_remove_name(m) if m["role"] == "assistant" else m for m in messages]
+        return {k: _remove_assistant_names(v) if k == "messages" else v for k, v in params.items()}
 
     def create(self, params: dict[str, Any]) -> ChatCompletion:
         """Create a completion for a given config using openai's client.
@@ -394,6 +402,7 @@ class OpenAIClient:
 
             create_or_parse = _create_or_parse
         else:
+            params = self._remove_assistant_names_from_messages(params)
             completions = self._oai_client.chat.completions if "messages" in params else self._oai_client.completions  # type: ignore [attr-defined]
             create_or_parse = completions.create
         # Wrap _create_or_parse with exception handling
