@@ -384,7 +384,7 @@ class OpenAIClient:
         """Create a completion for a given config using openai's client.
 
         Args:
-            client: The openai cliencompletions = self._oai_client.chat.completions if "messages" in params else self._oai_client.completionst.
+            client: The openai client.
             params: The params for the completion.
 
         Returns:
